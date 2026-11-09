@@ -1,159 +1,1285 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lemkecher</title>
-    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
-    <link rel="manifest" href="/manifest.json">
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-            background-color: #ffffff;
-        }
-        #particles-js {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            top: 0;
-            left: 0;
-            z-index: 1;
-        }
-        img {
-            max-width: 100%;
-            height: auto;
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            z-index: 2;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RCP Registre · TechMedCare</title>
+<style>
+  :root{
+    --bg:#0F1B24; --panel:#16262F; --panel-2:#1B2E38; --line:#26424F;
+    --sidebar-bg:#16262F; --panel-active:#1E3540; --card-line:transparent;
+    --header-grad:linear-gradient(180deg,#16262F,#12202A);
+
+    --ink:#E8EEF0; --ink-soft:#9DB2BC; --ink-mute:#6B828D;
+
+    /* teal split into fill / text / on-fill */
+    --teal:#3CBFA0; --teal-deep:#1D9E80; --teal-ink:#3CBFA0; --on-teal:#06131A;
+    --teal-tint:rgba(60,191,160,.08); --teal-tint-2:rgba(60,191,160,.14);
+
+    --amber:#E0A44B; --amber-ink:#E0A44B; --amber-line:#6B5322;
+    --amber-tint:rgba(224,164,75,.09);
+
+    --red:#E06A5B; --red-line:#7A3B34; --red-tint:rgba(224,106,91,.08);
+
+    --paper:#F5F3ED; --paper-ink:#23303A; --paper-mute:#5E6E78;
+    --paper-line:#E4DECF; --paper-line-strong:#D9D3C4;
+    --paper-shadow:0 8px 30px rgba(0,0,0,.3); --paper-border:1px solid transparent;
+    --sum-h:#1D9E80; --histo-bg:#EDEAE0;
+    --chip-bg:#12202A; --chip-bg-hover:#16323C; --chip-ink:#E8EEF0;
+
+    --radius:10px;
+    --mono:"SF Mono","JetBrains Mono","Consolas",monospace;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  }
+
+  [data-theme="light"]{
+    --bg:#EEF1F3; --panel:#FFFFFF; --panel-2:#F3F6F8; --line:#D5DEE3;
+    --sidebar-bg:#E9EDF0; --panel-active:#E4F2EE; --card-line:#E1E8EC;
+    --header-grad:linear-gradient(180deg,#FFFFFF,#F4F7F8);
+
+    --ink:#16242D; --ink-soft:#4C606C; --ink-mute:#70848E;
+
+    --teal:#12876E; --teal-deep:#0E6E59; --teal-ink:#0B6353; --on-teal:#FFFFFF;
+    --teal-tint:rgba(18,135,110,.09); --teal-tint-2:rgba(18,135,110,.16);
+
+    --amber:#B4740E; --amber-ink:#8A5B12; --amber-line:#E2C99A;
+    --amber-tint:rgba(180,116,14,.10);
+
+    --red:#B23A2B; --red-line:#E5B4AE; --red-tint:rgba(178,58,43,.09);
+
+    --paper:#FFFFFF; --paper-line:#E8ECEF; --paper-line-strong:#CFD8DD;
+    --paper-shadow:0 1px 3px rgba(16,36,48,.09); --paper-border:1px solid #DDE4E8;
+    --sum-h:#0E6E59; --histo-bg:#F2F5F7;
+    --chip-bg:#E9F5F1; --chip-bg-hover:#DCEDE7; --chip-ink:#0B3B32;
+  }
+
+
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:var(--sans);background:var(--bg);color:var(--ink);height:100vh;overflow:hidden;display:flex;flex-direction:column;}
+
+  header{display:flex;align-items:center;justify-content:space-between;padding:12px 22px;border-bottom:1px solid var(--line);background:linear-gradient(180deg,#16262F,#12202A);flex-shrink:0;}
+  .brand{display:flex;align-items:center;gap:12px;}
+  .brand img{width:30px;height:30px;object-fit:contain;border-radius:7px;}
+  .brand-name{font-weight:600;font-size:15px;}
+  .brand-name span{color:var(--teal);}
+  .brand-sub{font-size:11px;color:var(--ink-mute);letter-spacing:.08em;text-transform:uppercase;}
+  .privacy-pill{display:flex;align-items:center;gap:7px;font-size:11.5px;color:var(--teal);border:1px solid var(--teal-deep);background:rgba(60,191,160,.08);padding:5px 11px;border-radius:99px;}
+  .privacy-dot{width:6px;height:6px;border-radius:50%;background:var(--teal);box-shadow:0 0 8px var(--teal);}
+
+  /* Barre de session + quorum */
+  .session-bar{display:flex;align-items:center;gap:20px;padding:10px 22px;background:var(--panel-2);border-bottom:1px solid var(--line);flex-shrink:0;flex-wrap:wrap;}
+  .sb-block{display:flex;flex-direction:column;gap:2px;}
+  .sb-label{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-mute);}
+  .sb-value{font-size:13px;font-weight:500;}
+  .sb-sep{width:1px;height:28px;background:var(--line);}
+  .quorum{display:flex;align-items:center;gap:9px;margin-left:auto;}
+  .quorum-chips{display:flex;gap:5px;flex-wrap:wrap;}
+  .qc{font-size:10px;padding:3px 8px;border-radius:99px;border:1px solid var(--line);color:var(--ink-mute);font-family:var(--mono);}
+  .qc.on{border-color:var(--teal-deep);color:var(--teal);background:rgba(60,191,160,.08);}
+  .qc.off{border-color:#7A3B34;color:var(--red);background:rgba(224,106,91,.08);}
+  .quorum-status{font-size:12px;font-weight:600;padding:5px 12px;border-radius:8px;white-space:nowrap;}
+  .quorum-status.ko{background:rgba(224,164,75,.12);color:var(--amber);border:1px solid #6B5322;}
+  .quorum-status.ok{background:rgba(60,191,160,.1);color:var(--teal);border:1px solid var(--teal-deep);}
+
+  .layout{flex:1;display:grid;grid-template-columns:290px 1fr;overflow:hidden;}
+  .sidebar{border-right:1px solid var(--line);background:var(--panel);overflow-y:auto;padding:16px;}
+  .sidebar-label{font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--ink-mute);margin:4px 4px 12px;}
+  .patient-card{border-radius:var(--radius);padding:13px;margin-bottom:10px;cursor:pointer;background:var(--panel);transition:all .15s;position:relative;}
+  .patient-card:hover{background:var(--panel-2);}
+  .patient-card.active{background:#1E3540;box-shadow:inset 3px 0 0 var(--teal);}
+  .pc-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;}
+  .pc-initials{font-weight:600;font-size:15px;}
+  .pc-tag{font-size:10px;padding:2px 8px;border-radius:99px;color:#0C1114;font-weight:600;}
+  .pc-meta{font-size:12px;color:var(--ink-soft);}
+  .pc-id{font-family:var(--mono);font-size:10.5px;color:var(--ink-mute);margin-top:4px;}
+  .pc-status{display:inline-flex;align-items:center;gap:5px;font-size:10.5px;margin-top:8px;border-radius:99px;padding:2px 9px;}
+  .pc-status.ok{color:var(--teal);border:1px solid var(--teal-deep);background:rgba(60,191,160,.07);}
+  .pc-status.ko{color:var(--amber);border:1px solid #6B5322;background:rgba(224,164,75,.07);}
+
+  .main{overflow-y:auto;padding:22px 26px;}
+  .empty-state{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;color:var(--ink-mute);}
+  .empty-state h2{font-weight:500;color:var(--ink-soft);margin-bottom:8px;font-size:18px;}
+  .empty-state p{font-size:13px;max-width:400px;line-height:1.6;}
+  .empty-mark{font-size:38px;margin-bottom:16px;opacity:.5;}
+
+  .patient-head{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px;}
+  .ph-name{font-size:21px;font-weight:600;}
+  .ph-cancer{font-size:13.5px;color:var(--ink-soft);margin-top:3px;}
+  .ph-right{font-family:var(--mono);font-size:11.5px;color:var(--ink-mute);text-align:right;line-height:1.6;}
+
+  /* Bandeau complétude */
+  .completeness{border-radius:var(--radius);padding:13px 16px;margin-bottom:18px;display:flex;gap:12px;align-items:flex-start;}
+  .completeness.ok{background:rgba(60,191,160,.07);border:1px solid var(--teal-deep);}
+  .completeness.ko{background:rgba(224,164,75,.07);border:1px solid #6B5322;}
+  .cmp-icon{font-size:16px;line-height:1.2;}
+  .cmp-title{font-size:13.5px;font-weight:600;margin-bottom:3px;}
+  .completeness.ok .cmp-title{color:var(--teal);}
+  .completeness.ko .cmp-title{color:var(--amber);}
+  .cmp-item{font-size:12.5px;color:var(--ink-soft);line-height:1.55;margin-top:5px;}
+  .cmp-item strong{color:var(--ink);font-weight:500;}
+
+  .split{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start;}
+  @media(max-width:1150px){.split{grid-template-columns:1fr;}}
+  .col-label{display:flex;align-items:center;gap:9px;font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-mute);margin-bottom:13px;}
+  .col-count{background:var(--panel-2);border:1px solid var(--line);border-radius:99px;padding:1px 8px;font-size:11px;color:var(--ink-soft);}
+
+  .doc{border:1px solid var(--line);border-radius:var(--radius);margin-bottom:10px;overflow:hidden;background:var(--panel);}
+  .doc-head{display:flex;align-items:center;justify-content:space-between;padding:10px 13px;cursor:pointer;gap:10px;}
+  .doc-head:hover{background:var(--panel-2);}
+  .doc-title{font-size:13px;font-weight:500;}
+  .doc-sub{font-size:11px;color:var(--ink-mute);margin-top:2px;}
+  .sys-chip{font-size:10px;padding:2px 9px;border-radius:99px;font-weight:600;color:#fff;white-space:nowrap;}
+  .lang-chip{font-size:9.5px;padding:1px 6px;border-radius:4px;border:1px solid var(--line);color:var(--ink-mute);margin-left:6px;}
+  .partial-chip{font-size:9.5px;padding:1px 7px;border-radius:4px;border:1px solid #6B5322;color:var(--amber);margin-left:6px;}
+  .doc-body{display:grid;grid-template-rows:0fr;transition:grid-template-rows .3s ease;font-family:var(--mono);font-size:11.5px;line-height:1.65;color:var(--ink-soft);white-space:pre-wrap;border-top:0 solid var(--line);padding:0 13px;}
+  .doc-body-inner{overflow:hidden;padding:0;transition:padding .3s ease;}
+  .doc.open .doc-body{grid-template-rows:1fr;border-top:1px solid var(--line);}
+  .doc.open .doc-body-inner{padding:11px 0 13px;}
+  .doc-toggle{color:var(--ink-mute);font-size:12px;transition:transform .15s;}
+  .doc.open .doc-toggle{transform:rotate(90deg);}
+
+  .gen-btn{width:100%;padding:13px;border-radius:var(--radius);border:none;background:linear-gradient(135deg,var(--teal),var(--teal-deep));color:#06131A;font-weight:600;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:9px;}
+  .gen-btn:hover{filter:brightness(1.08);}
+  .gen-btn:disabled{opacity:.6;cursor:default;}
+
+  .placeholder-paper{border:1.5px dashed var(--line);border-radius:var(--radius);padding:38px 24px;text-align:center;color:var(--ink-mute);}
+  .placeholder-paper .pp-icon{font-size:28px;opacity:.4;margin-bottom:12px;}
+  .placeholder-paper p{font-size:13px;line-height:1.6;max-width:330px;margin:0 auto;}
+
+  /* Pipeline */
+  .pipeline{padding:24px 18px 18px;}
+  .pipe-header{display:flex;align-items:center;gap:12px;margin-bottom:20px;}
+  .pipe-pulse{width:13px;height:13px;border-radius:50%;background:var(--teal);animation:pipePulse 1.4s ease-in-out infinite;}
+  @keyframes pipePulse{0%{box-shadow:0 0 0 0 rgba(60,191,160,.5);}70%{box-shadow:0 0 0 10px rgba(60,191,160,0);}100%{box-shadow:0 0 0 0 rgba(60,191,160,0);}}
+  .pipe-title{font-size:13px;color:var(--teal);font-family:var(--mono);}
+  .pipe-elapsed{font-size:11px;color:var(--ink-mute);font-family:var(--mono);margin-left:auto;}
+  .pipe-bar-wrap{height:3px;background:var(--line);border-radius:99px;margin-bottom:20px;overflow:hidden;}
+  .pipe-bar{height:100%;background:linear-gradient(90deg,var(--teal-deep),var(--teal));border-radius:99px;width:0%;}
+  .pipe-step{display:flex;align-items:flex-start;gap:12px;padding:7px 0;position:relative;}
+  .pipe-step:not(:last-child)::after{content:"";position:absolute;left:9px;top:25px;bottom:-7px;width:1px;background:var(--line);}
+  .pipe-icon{width:20px;height:20px;border-radius:50%;border:1.5px solid var(--line);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;background:var(--panel);transition:all .3s;}
+  .pipe-icon.done{background:var(--teal);border-color:var(--teal);}
+  .pipe-icon.active{border-color:var(--teal);background:rgba(60,191,160,.12);}
+  .pipe-icon svg{width:10px;height:10px;display:none;}
+  .pipe-icon.done svg{display:block;}
+  .pipe-icon .dot{width:6px;height:6px;border-radius:50%;background:var(--teal);display:none;animation:dotPulse .8s ease-in-out infinite alternate;}
+  .pipe-icon.active .dot{display:block;}
+  @keyframes dotPulse{from{opacity:.4;transform:scale(.8);}to{opacity:1;transform:scale(1.1);}}
+  .pipe-label{font-size:13px;color:var(--ink-mute);transition:color .3s;}
+  .pipe-label.active{color:var(--ink);}
+  .pipe-label.done{color:var(--ink-soft);}
+  .pipe-sub{font-size:11px;color:var(--ink-mute);font-family:var(--mono);display:none;}
+  .pipe-sub.show{display:block;}
+
+  /* Fiche */
+  .paper{background:var(--paper);color:var(--paper-ink);border-radius:var(--radius);padding:20px 22px;box-shadow:0 8px 30px rgba(0,0,0,.3);}
+  .paper-head{border-bottom:2px solid #D9D3C4;padding-bottom:11px;margin-bottom:6px;}
+  .ph-row{display:flex;align-items:center;justify-content:space-between;gap:10px;}
+  .paper-title{font-size:14.5px;font-weight:700;letter-spacing:.02em;}
+  .paper-ref{font-size:9.5px;color:var(--paper-mute);font-family:var(--mono);margin-top:4px;}
+  .fiche-status{font-size:10px;font-weight:700;padding:3px 9px;border-radius:5px;white-space:nowrap;}
+  .fiche-status.valid{background:#DCEFE6;color:#186A4E;}
+  .fiche-status.pending{background:#F7E7CC;color:#8A5B12;}
+  .paper-meta{display:grid;grid-template-columns:1fr 1fr;gap:4px 14px;margin:10px 0 4px;padding:10px 0;border-bottom:1px solid #E4DECF;}
+  .pm-item{font-size:11.5px;color:var(--paper-mute);}
+  .pm-item b{color:var(--paper-ink);font-weight:600;}
+
+  .sum-section{padding:11px 0;border-bottom:1px solid #E4DECF;}
+  .sum-section:last-child{border-bottom:none;}
+  .sum-h{font-size:10.5px;text-transform:uppercase;letter-spacing:.07em;color:var(--teal-deep);font-weight:700;margin-bottom:6px;}
+  .sum-section.warn .sum-h{color:#9A6212;}
+  .sum-t{font-size:13px;line-height:1.55;color:var(--paper-ink);white-space:pre-line;}
+  .kv{display:grid;grid-template-columns:auto 1fr;gap:3px 12px;font-size:12.5px;line-height:1.5;}
+  .kv .k{color:var(--paper-mute);white-space:nowrap;}
+  .kv .v{color:var(--paper-ink);}
+  .kv .v.warn{color:#9A6212;font-weight:600;}
+  .sum-section.sources .sum-t{color:var(--paper-mute);font-size:12px;font-style:italic;}
+  .sum-section.histo{background:#EDEAE0;border-radius:6px;padding:11px 13px;margin:8px 0;border-bottom:none;}
+
+  .footnote{font-size:11px;color:var(--ink-mute);margin-top:13px;line-height:1.5;text-align:center;}
+  .footnote strong{color:var(--ink-soft);font-weight:500;}
+
+  /* Imagerie: chips dans la fiche */
+  .scan-chip{display:inline-flex;align-items:center;gap:8px;background:#12202A;border:1px solid var(--teal-deep);border-radius:8px;padding:6px 10px;margin:0 7px 7px 0;cursor:pointer;transition:all .15s;}
+  .scan-chip:hover{background:#16323C;transform:translateY(-1px);}
+  .scan-chip .sc-mod{font-family:var(--mono);font-size:9.5px;color:#06131A;background:var(--teal);padding:1px 6px;border-radius:4px;font-weight:700;}
+  .scan-chip .sc-label{font-size:11.5px;color:var(--ink);}
+  .scan-chip .sc-arrow{color:var(--teal);font-size:11px;}
+  .imagerie-note{font-size:11.5px;color:var(--paper-mute);font-style:italic;margin-top:4px;}
+
+  /* Visionneuse */
+  .viewer-overlay{position:fixed;inset:0;background:rgba(4,10,14,.92);display:none;align-items:center;justify-content:center;z-index:100;backdrop-filter:blur(3px);}
+  .viewer-overlay.open{display:flex;}
+  .viewer{width:min(960px,94vw);height:min(680px,92vh);background:#050C10;border:1px solid #1C3540;border-radius:12px;display:grid;grid-template-rows:auto 1fr auto;overflow:hidden;box-shadow:0 20px 70px rgba(0,0,0,.6);}
+  .viewer-top{display:flex;align-items:center;justify-content:space-between;padding:11px 16px;border-bottom:1px solid #14262E;background:#081319;}
+  .vt-patient{display:flex;align-items:baseline;gap:12px;}
+  .vt-name{font-weight:600;font-size:14px;}
+  .vt-meta{font-family:var(--mono);font-size:11px;color:var(--ink-mute);}
+  .vt-close{background:none;border:1px solid #24424F;color:var(--ink-soft);border-radius:6px;width:30px;height:30px;cursor:pointer;font-size:16px;}
+  .vt-close:hover{background:#14262E;}
+  .viewer-body{display:grid;grid-template-columns:88px 1fr;overflow:hidden;}
+  .series-rail{border-right:1px solid #14262E;padding:10px 8px;overflow-y:auto;background:#060F14;}
+  .series-thumb{width:100%;border-radius:5px;margin-bottom:8px;cursor:pointer;border:2px solid transparent;overflow:hidden;background:#000;}
+  .series-thumb img{width:100%;display:block;aspect-ratio:1;object-fit:cover;}
+  .series-thumb.active{border-color:var(--teal);}
+  .series-thumb .st-name{font-size:8px;color:var(--ink-mute);text-align:center;padding:2px;word-break:break-all;}
+  .canvas-wrap{position:relative;display:flex;align-items:center;justify-content:center;background:#000;overflow:hidden;}
+  .scan-img{max-width:100%;max-height:100%;display:block;}
+  .ov{position:absolute;font-family:var(--mono);font-size:10.5px;color:#7Fe0c4;text-shadow:0 1px 2px #000;pointer-events:none;line-height:1.5;}
+  .ov-tl{top:10px;left:12px;} .ov-tr{top:10px;right:12px;text-align:right;}
+  .ov-bl{bottom:10px;left:12px;} .ov-br{bottom:10px;right:12px;text-align:right;color:var(--ink-mute);}
+  .lesion-marker{position:absolute;pointer-events:none;}
+  .lesion-ring{width:46px;height:46px;border:2px solid var(--amber);border-radius:50%;box-shadow:0 0 12px rgba(224,164,75,.5);animation:lesionPulse 2s infinite;}
+  @keyframes lesionPulse{0%,100%{transform:scale(1);opacity:1;}50%{transform:scale(1.12);opacity:.75;}}
+  .lesion-tag{position:absolute;top:-8px;left:52px;white-space:nowrap;background:var(--amber);color:#1A1206;font-size:11px;font-weight:700;padding:2px 8px;border-radius:5px;}
+  .lesion-tag small{display:block;font-weight:500;font-size:9.5px;}
+  .viewer-bottom{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:10px 16px;border-top:1px solid #14262E;background:#081319;}
+  .wl-control{display:flex;align-items:center;gap:10px;flex:1;}
+  .wl-control label{font-size:11px;color:var(--ink-mute);font-family:var(--mono);white-space:nowrap;}
+  .wl-control input[type=range]{flex:1;max-width:140px;accent-color:var(--teal);}
+  .ann-toggle{font-size:11px;color:var(--ink-soft);border:1px solid #24424F;border-radius:6px;padding:5px 10px;cursor:pointer;background:none;}
+  .ann-toggle.on{color:var(--amber);border-color:#6B5322;background:rgba(224,164,75,.08);}
+  .ohif-link{display:inline-flex;align-items:center;gap:7px;font-size:12px;color:var(--teal);border:1px solid var(--teal-deep);border-radius:7px;padding:6px 12px;cursor:pointer;background:rgba(60,191,160,.06);text-decoration:none;}
+  .ohif-link:hover{background:rgba(60,191,160,.14);}
+  .synthetic-stamp{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) rotate(-24deg);font-size:34px;font-weight:800;color:rgba(255,255,255,.05);letter-spacing:.1em;pointer-events:none;user-select:none;}
+
+/* --- rules that had hardcoded darks --- */
+header{background:var(--header-grad);}
+.sidebar{background:var(--sidebar-bg);}
+.patient-card{border:1px solid var(--card-line);}
+.patient-card.active{background:var(--panel-active);box-shadow:inset 3px 0 0 var(--teal);}
+.privacy-pill{color:var(--teal-ink);border-color:var(--teal-deep);background:var(--teal-tint);}
+.qc.on{border-color:var(--teal-deep);color:var(--teal-ink);background:var(--teal-tint);}
+.qc.off{border-color:var(--red-line);color:var(--red);background:var(--red-tint);}
+.quorum-status.ok{background:var(--teal-tint);color:var(--teal-ink);border:1px solid var(--teal-deep);}
+.quorum-status.ko{background:var(--amber-tint);color:var(--amber-ink);border:1px solid var(--amber-line);}
+.pc-status.ok{color:var(--teal-ink);border:1px solid var(--teal-deep);background:var(--teal-tint);}
+.pc-status.ko{color:var(--amber-ink);border:1px solid var(--amber-line);background:var(--amber-tint);}
+.completeness.ok{background:var(--teal-tint);border:1px solid var(--teal-deep);}
+.completeness.ko{background:var(--amber-tint);border:1px solid var(--amber-line);}
+.completeness.ok .cmp-title{color:var(--teal-ink);}
+.completeness.ko .cmp-title{color:var(--amber-ink);}
+.partial-chip{border:1px solid var(--amber-line);color:var(--amber-ink);}
+.pipe-title{color:var(--teal-ink);}
+.pipe-icon.active{border-color:var(--teal);background:var(--teal-tint-2);}
+.pipe-icon.done svg path{stroke:var(--on-teal);}
+.gen-btn{color:var(--on-teal);}
+
+/* --- fiche --- */
+.paper{box-shadow:var(--paper-shadow);border:var(--paper-border);}
+.paper-head{border-bottom:2px solid var(--paper-line-strong);}
+.paper-meta{border-bottom:1px solid var(--paper-line);}
+.sum-section{border-bottom:1px solid var(--paper-line);}
+.sum-section:last-child{border-bottom:none;}
+.sum-h{color:var(--sum-h);}
+.sum-section.histo{background:var(--histo-bg);border-bottom:none;}
+.scan-chip{background:var(--chip-bg);border:1px solid var(--teal-deep);}
+.scan-chip:hover{background:var(--chip-bg-hover);}
+.scan-chip .sc-mod{background:var(--teal);color:var(--on-teal);}
+.scan-chip .sc-label{color:var(--chip-ink);}
+.scan-chip .sc-arrow{color:var(--teal-ink);}
+
+/* --- viewer stays dark in both themes --- */
+.viewer-overlay{
+  --ink:#E8EEF0; --ink-soft:#9DB2BC; --ink-mute:#6B828D; --line:#26424F;
+  --teal:#3CBFA0; --teal-deep:#1D9E80; --teal-ink:#3CBFA0; --on-teal:#06131A;
+  --teal-tint:rgba(60,191,160,.06); --teal-tint-2:rgba(60,191,160,.14);
+  --amber:#E0A44B; --amber-ink:#E0A44B; --amber-line:#6B5322;
+  color:var(--ink);
+}
+.ohif-link{color:var(--teal-ink);border-color:var(--teal-deep);background:var(--teal-tint);}
+.sum-section.synthese{background:#F7F4EC;border-radius:8px;padding:13px 15px;margin:8px 0;border-bottom:none;}
+.question-box{margin-top:12px;background:#FFFFFF;border:1.5px solid var(--teal-deep);border-left:5px solid var(--teal-deep);border-radius:8px;padding:11px 14px;}
+.question-label{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--teal-deep);font-weight:700;margin-bottom:5px;}
+.question-text{font-size:14.5px;font-weight:600;line-height:1.45;color:var(--paper-ink);}
+
+/* ============ Quorum interactif ============ */
+:root{ color-scheme:dark; }
+[data-theme="light"]{ color-scheme:light; }
+button.qc{background:none;cursor:pointer;font-family:var(--mono);transition:filter .15s,transform .1s;}
+button.qc:hover{filter:brightness(1.2);transform:translateY(-1px);}
+.qc.dist{border-style:dashed;}
+.qc .qc-mark{margin-left:3px;opacity:.85;}
+button.quorum-status{cursor:pointer;font-family:var(--sans);display:flex;align-items:baseline;gap:7px;}
+button.quorum-status:hover{filter:brightness(1.1);}
+.qs-sub{font-weight:400;font-size:11px;opacity:.8;}
+
+.quorum-alert{display:none;flex-direction:column;gap:6px;padding:9px 22px;border-bottom:1px solid var(--line);background:var(--amber-tint);font-size:12.5px;color:var(--ink-soft);flex-shrink:0;}
+.quorum-alert.show{display:flex;}
+.quorum-alert.lost{background:var(--red-tint);}
+.qa-line{line-height:1.5;}
+.qa-line.risk b{color:var(--amber-ink);font-weight:600;}
+.qa-line.lost b{color:var(--red);font-weight:600;}
+.qa-btn{font-size:11.5px;padding:4px 11px;border-radius:6px;border:1px solid var(--amber-line);background:var(--panel);color:var(--amber-ink);cursor:pointer;font-family:var(--sans);}
+.qa-btn:hover{background:var(--panel-2);}
+
+.pc-rank{font-family:var(--mono);font-size:10px;color:var(--ink-mute);border:1px solid var(--line);border-radius:4px;padding:0 5px;margin-right:7px;vertical-align:2px;}
+.pc-badges{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px;}
+.pc-badges .pc-status{margin-top:0;}
+.pc-status.bad{color:var(--red);border:1px solid var(--red-line);background:var(--red-tint);}
+.pc-status.done{color:var(--on-teal);border:1px solid var(--teal);background:var(--teal);}
+
+.completeness.bad{background:var(--red-tint);border:1px solid var(--red-line);}
+.completeness.bad .cmp-title{color:var(--red);}
+.req-chips{display:flex;gap:5px;flex-wrap:wrap;margin-top:6px;}
+
+.decision{margin-top:14px;border-radius:var(--radius);padding:13px 15px;border:1px solid var(--line);background:var(--panel);display:flex;flex-direction:column;gap:9px;}
+.dec-title{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-mute);}
+.dec-note{font-size:12.5px;color:var(--ink-soft);line-height:1.55;}
+.dec-note b{color:var(--ink);font-weight:600;}
+.dec-note.ok b{color:var(--teal-ink);}
+.dec-note.bad b{color:var(--red);}
+.dec-row{display:flex;gap:8px;flex-wrap:wrap;}
+.dec-btn{flex:1;min-width:180px;padding:10px 14px;border-radius:8px;border:none;background:linear-gradient(135deg,var(--teal),var(--teal-deep));color:var(--on-teal);font-weight:600;font-size:13px;cursor:pointer;font-family:var(--sans);}
+.dec-btn:hover{filter:brightness(1.08);}
+.dec-btn:disabled{background:var(--panel-2);color:var(--ink-mute);border:1px dashed var(--line);cursor:not-allowed;filter:none;}
+.dec-btn.secondary{background:none;border:1px solid var(--line);color:var(--ink-soft);font-weight:500;}
+.dec-btn.secondary:hover{background:var(--panel-2);}
+.dec-btn.warn{background:none;border:1px solid var(--amber-line);color:var(--amber-ink);}
+.dec-input{width:100%;resize:vertical;min-height:64px;background:var(--panel-2);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:9px 11px;font:inherit;font-size:13px;line-height:1.5;}
+.dec-input:focus{outline:none;border-color:var(--teal);}
+.dec-input.err{border-color:var(--red);box-shadow:0 0 0 3px var(--red-tint);}
+.dec-text{font-size:13.5px;line-height:1.55;color:var(--ink);padding:9px 12px;border-left:3px solid var(--teal);background:var(--teal-tint);border-radius:0 8px 8px 0;white-space:pre-wrap;}
+.kv .v.dec-v{font-weight:600;white-space:pre-wrap;}
+.dec-next{font-size:12.5px;color:var(--ink-soft);padding:8px 11px;border:1px dashed var(--line);border-radius:8px;}
+.dec-next b{color:var(--ink);}
+.dec-sim{font-size:11px;color:var(--ink-mute);font-style:italic;margin-top:-4px;}
+.diff{border:1px solid var(--line);border-radius:8px;padding:11px 12px;display:flex;flex-direction:column;gap:8px;background:var(--panel-2);}
+.diff-row{display:flex;gap:10px;align-items:flex-start;font-size:12.5px;color:var(--ink);cursor:pointer;}
+.diff-row input{margin-top:3px;accent-color:var(--teal);}
+.diff-row small{color:var(--ink-mute);font-size:11px;}
+
+/* Impression : uniquement la fiche */
+@media print{
+  @page{size:A4;margin:14mm;}
+  html,body{height:auto;overflow:visible;background:#fff;}
+  header,.session-bar,.quorum-alert,.sidebar,.patient-head,.completeness,#quorumBanner,
+  .split > div:first-child,.col-label,.gen-btn,.footnote,.decision,.viewer-overlay,.qp-overlay{display:none !important;}
+  .layout,.main,.split{display:block !important;overflow:visible !important;padding:0 !important;}
+  .paper{box-shadow:none !important;border:none !important;padding:0 !important;}
+  .scan-chip{border:1px solid #999 !important;background:#fff !important;}
+}
+
+/* Panneau émargement */
+.qp-overlay{position:fixed;inset:0;background:rgba(4,10,14,.55);display:none;align-items:flex-start;justify-content:center;z-index:90;padding:64px 16px 16px;backdrop-filter:blur(2px);}
+.qp-overlay.open{display:flex;}
+.qp{width:min(880px,100%);max-height:calc(100vh - 90px);overflow:auto;background:var(--panel);color:var(--ink);border:1px solid var(--line);border-radius:12px;padding:18px 20px 20px;box-shadow:0 20px 60px rgba(0,0,0,.35);}
+.qp-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:14px;}
+.qp-title{font-size:16px;font-weight:600;}
+.qp-sub{font-size:12px;color:var(--ink-mute);margin-top:3px;}
+.qp-h{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-mute);margin:16px 0 8px;}
+.qp-scroll{overflow-x:auto;}
+.qp-table{width:100%;border-collapse:collapse;font-size:12.5px;min-width:620px;}
+.qp-table th{text-align:left;font-weight:500;color:var(--ink-mute);font-size:11px;padding:6px 8px;border-bottom:1px solid var(--line);}
+.qp-table td{padding:7px 8px;border-bottom:1px solid var(--line);vertical-align:middle;}
+.qp-table tr:last-child td{border-bottom:none;}
+.qp-table select,.qp-table input{background:var(--panel-2);color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:4px 6px;font:inherit;font-size:12px;}
+.qp-table input:disabled{opacity:.4;}
+.muted{color:var(--ink-mute);}
+.q-ok{color:var(--teal-ink);font-weight:600;}
+.q-ko{color:var(--red);font-weight:600;}
+.q-done{color:var(--ink-soft);}
+.qp-rules{font-size:11.5px;color:var(--ink-mute);line-height:1.6;margin-top:14px;padding:10px 12px;border:1px dashed var(--line);border-radius:8px;}
+.qp-log{font-size:12px;color:var(--ink-soft);display:flex;flex-direction:column;gap:4px;max-height:160px;overflow:auto;}
+.qp-log span{font-family:var(--mono);color:var(--ink-mute);margin-right:8px;}
+</style>
 </head>
 <body>
-    <div id="particles-js"></div>
-    <img src="logo2.png" alt="Calligraphy">
+  <header>
+    <div class="brand">
+      <img src="logo.png" alt="TechMedCare" onerror="this.style.display='none'">
+      <div>
+        <div class="brand-name">RCP <span>Registre</span></div>
+        <div class="brand-sub">TechMedCare · Clinique Hannibal</div>
+      </div>
+    </div>
 
-    <script src="particles.js"></script>
-    <script>
-    particlesJS('particles-js', {
-      "particles": {
-        "number": {
-          "value": 80,
-          "density": {
-            "enable": true,
-            "value_area": 600
-          }
-        },
-        "color": {
-          "value": "#C8102E"
-        },
-        "shape": {
-          "type": "circle",
-          "stroke": {
-            "width": 0,
-            "color": "C8102E"
-          },
-          "polygon": {
-            "nb_sides": 5
-          }
-        },
-        "opacity": {
-          "value": 0.8,
-          "random": false,
-          "anim": {
-            "enable": false,
-            "speed": 1,
-            "opacity_min": 0.1,
-            "sync": false
-          }
-        },
-        "size": {
-          "value": 4,
-          "random": true,
-          "anim": {
-            "enable": false,
-            "speed": 40,
-            "size_min": 0.1,
-            "sync": false
-          }
-        },
-        "line_linked": {
-          "enable": true,
-          "distance": 150,
-          "color": "#C8102E",
-          "opacity": 0.4,
-          "width": 1
-        },
-        "move": {
-          "enable": true,
-          "speed": 6,
-          "direction": "none",
-          "random": false,
-          "straight": false,
-          "out_mode": "out",
-          "bounce": false,
-          "attract": {
-            "enable": false,
-            "rotateX": 600,
-            "rotateY": 1200
-          }
-        }
-      },
-      "interactivity": {
-        "detect_on": "canvas",
-        "events": {
-          "onhover": {
-            "enable": true,
-            "mode": "repulse"
-          },
-          "onclick": {
-            "enable": true,
-            "mode": "push"
-          },
-          "resize": true
-        },
-        "modes": {
-          "grab": {
-            "distance": 140,
-            "line_linked": {
-              "opacity": 1
-            }
-          },
-          "bubble": {
-            "distance": 400,
-            "size": 40,
-            "duration": 2,
-            "opacity": 8,
-            "speed": 3
-          },
-          "repulse": {
-            "distance": 200,
-            "duration": 0.4
-          },
-          "push": {
-            "particles_nb": 4
-          },
-          "remove": {
-            "particles_nb": 2
-          }
-        }
-      },
-      "retina_detect": true
+    <button id="themeBtn" class="privacy-pill" style="cursor:pointer" onclick="toggleTheme()">
+      ◐ <span id="themeLbl">Clair</span>
+    </button>
+  </header>
+
+  <div class="session-bar" id="sessionBar"></div>
+  <div class="quorum-alert" id="quorumAlert"></div>
+
+  <!-- Panneau émargement & quorum -->
+  <div class="qp-overlay" id="qpOverlay" onclick="if(event.target===this)closeQuorumPanel()">
+    <div class="qp" role="dialog" aria-label="Émargement et quorum">
+      <div class="qp-head">
+        <div>
+          <div class="qp-title">Émargement et quorum</div>
+          <div class="qp-sub" id="qpSub"></div>
+        </div>
+        <button class="vt-close" onclick="closeQuorumPanel()" title="Fermer">✕</button>
+      </div>
+      <div id="qpBody"></div>
+    </div>
+  </div>
+
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="sidebar-label">Dossiers de la session</div>
+      <div id="patientList"></div>
+      <div class="footnote" style="margin-top:18px;text-align:left;">
+        <strong>Démonstration.</strong> Patients fictifs, données synthétiques. Structure de fiche conforme au socle commun INCa / ASIP Santé.
+      </div>
+    </aside>
+
+    <main class="main" id="main">
+      <div class="empty-state">
+        <div class="empty-mark">◧</div>
+        <h2>Sélectionnez un dossier</h2>
+        <p>L'outil vérifie la complétude du dossier, consolide les documents dispersés sur les quatre systèmes, et prépare une fiche RCP structurée.</p>
+      </div>
+    </main>
+  </div>
+
+  <!-- Visionneuse d'imagerie -->
+  <div class="viewer-overlay" id="viewerOverlay" onclick="if(event.target===this)closeViewer()">
+    <div class="viewer">
+      <div class="viewer-top">
+        <div class="vt-patient"><span class="vt-name" id="vtName">—</span><span class="vt-meta" id="vtMeta">—</span></div>
+        <button class="vt-close" onclick="closeViewer()" title="Fermer">✕</button>
+      </div>
+      <div class="viewer-body">
+        <div class="series-rail" id="seriesRail"></div>
+        <div class="canvas-wrap" id="canvasWrap">
+          <img class="scan-img" id="scanImg" alt="Coupe synthétique">
+          <div class="synthetic-stamp">SYNTHÉTIQUE</div>
+          <div class="ov ov-tl" id="ovTL"></div>
+          <div class="ov ov-tr" id="ovTR"></div>
+          <div class="ov ov-bl" id="ovBL"></div>
+          <div class="ov ov-br">DÉMO · non diagnostique</div>
+          <div class="lesion-marker" id="lesionMarker" style="display:none">
+            <div class="lesion-ring"></div>
+            <div class="lesion-tag" id="lesionTag"></div>
+          </div>
+        </div>
+      </div>
+      <div class="viewer-bottom">
+        <div class="wl-control">
+          <label>W/L</label>
+          <input type="range" id="wlBright" min="60" max="150" value="100" oninput="applyWL()" title="Luminosité">
+          <input type="range" id="wlContrast" min="70" max="200" value="115" oninput="applyWL()" title="Contraste">
+          <button class="ann-toggle on" id="annToggle" onclick="toggleAnn()">Annotations</button>
+        </div>
+        <a class="ohif-link" id="ohifLink" target="_blank" rel="noopener">⧉ Ouvrir dans OHIF</a>
+      </div>
+    </div>
+  </div>
+
+<script src="patients_data.js"></script>
+<script src="fiches.js"></script>
+<script src="images_data.js"></script>
+<script>
+const state = { current:null, fiches:{} };
+
+function sysChip(key){
+  const s = SYSTEMS[key];
+  return `<span class="sys-chip" style="background:${s.color}" title="${s.sub}">${s.name}</span>`;
+}
+
+function setTheme(t){
+  document.documentElement.dataset.theme = t;
+  localStorage.setItem("rcp-theme", t);
+  const l = document.getElementById("themeLbl");
+  if(l) l.textContent = t === "light" ? "Sombre" : "Clair";
+}
+function toggleTheme(){
+  setTheme(document.documentElement.dataset.theme === "light" ? "dark" : "light");
+}
+setTheme(localStorage.getItem("rcp-theme")
+  || (matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark"));
+
+// ================= Quorum par dossier =================
+const STATUTS = { present:"Présent", distance:"À distance (visio)", absent:"Absent" };
+state.decisions = {};              // id -> { statut:'valide'|'reporte', heure, participants, manque }
+state.log = [];                    // journal de séance
+state.order = PATIENTS.map(p=>p.id);
+state.generating = null;
+let qpOpen = false;
+
+const nowHM = () => new Date().toTimeString().slice(0,5);
+const fmtH  = hm => hm ? hm.replace(":", "h") : "";
+const spec  = code => SESSION.specialites.find(s=>s.code===code);
+const isIn  = s => s && (s.statut==="present" || s.statut==="distance");
+const presentSpecs = () => SESSION.specialites.filter(isIn);
+const specName = code => (spec(code)||{nom:code}).nom;
+const pById = id => PATIENTS.find(p=>p.id===id);
+const plural = (n, one, many) => n>1 ? many : one;
+
+function logEvent(t){ state.log.push({ h: nowHM(), t }); }
+
+function qcClass(s){ return s.statut==="present" ? "on" : s.statut==="distance" ? "on dist" : "off"; }
+function qcChip(s, clickable){
+  const mark = s.statut==="distance" ? '<span class="qc-mark">⌁</span>'
+             : (isIn(s) && s.depart) ? '<span class="qc-mark">⏱</span>' : "";
+  const tip = `${s.nom} · ${s.medecin||"médecin à renseigner"} · ${STATUTS[s.statut]}`
+            + (isIn(s)&&s.depart ? ` · part à ${fmtH(s.depart)}` : "")
+            + (clickable ? " — cliquer pour changer" : "");
+  return clickable
+    ? `<button class="qc ${qcClass(s)}" title="${tip}" onclick="cycleSpec('${s.code}')">${s.code}${mark}</button>`
+    : `<span class="qc ${qcClass(s)}" title="${tip}">${s.code}${mark}</span>`;
+}
+
+// ok : toutes les spécialités requises présentes + minimum HAS de 3 spécialités
+function dossierQuorum(p){
+  const req = p.specialitesRequises || [];
+  const manque = req.filter(c=>!isIn(spec(c)));
+  const ok = manque.length===0 && presentSpecs().length >= (SESSION.quorumMinimum||3);
+  const departs = req.map(spec).filter(s=>isIn(s) && s.depart)
+                     .sort((a,b)=>a.depart.localeCompare(b.depart));
+  return { ok, manque, departs, req };
+}
+// 'valide' | 'reporte' | 'ok' | 'ko'
+function dossierEtat(p){
+  const d = state.decisions[p.id];
+  if(d) return d.statut;
+  return dossierQuorum(p).ok ? "ok" : "ko";
+}
+
+// Ordre suggéré : dossiers dont un spécialiste requis part bientôt,
+// puis les autres dossiers validables, puis ceux sans quorum, puis les traités.
+function suggestedOrder(){
+  const rank = p=>{
+    const e = dossierEtat(p);
+    if(e==="valide" || e==="reporte") return [3,"~"];
+    if(e==="ko") return [2,"~"];
+    const q = dossierQuorum(p);
+    return q.departs.length ? [0, q.departs[0].depart] : [1,"~"];
+  };
+  return [...PATIENTS].sort((a,b)=>{
+    const ra=rank(a), rb=rank(b);
+    return ra[0]-rb[0] || ra[1].localeCompare(rb[1]) || state.order.indexOf(a.id)-state.order.indexOf(b.id);
+  }).map(p=>p.id);
+}
+function applyOrder(){
+  state.order = suggestedOrder();
+  logEvent("Ordre du jour réorganisé : " + state.order.map(id=>pById(id).initials).join(" → "));
+  refreshAll();
+}
+
+function setStatut(code, val){
+  const s = spec(code); const old = s.statut;
+  if(old===val) return;
+  s.statut = val;
+  const who = `${s.medecin||"Médecin"} (${s.code})`;
+  if(val==="absent" && isIn({statut:old})){ s.parti = nowHM(); logEvent(`${who} a quitté la séance`); }
+  else if(val==="distance") logEvent(`${who} rejoint à distance (visio)`);
+  else if(val==="present" && old==="absent"){ s.parti = null; logEvent(`${who} présent en salle`); }
+  else logEvent(`${who} : ${STATUTS[val]}`);
+  refreshAll();
+}
+function setDepart(code, val){
+  const s = spec(code);
+  s.depart = val || null;
+  logEvent(val ? `Départ annoncé : ${s.medecin||s.code} (${s.code}) à ${fmtH(val)}` : `Départ annulé : ${s.code}`);
+  refreshAll();
+}
+// Clic sur une puce : présent → à distance → absent → présent
+function cycleSpec(code){
+  const next = { present:"distance", distance:"absent", absent:"present" };
+  setStatut(code, next[spec(code).statut]);
+}
+
+function refreshAll(){
+  renderSessionBar();
+  renderAlert();
+  renderPatientList();
+  if(state.current){
+    const p = pById(state.current);
+    renderQuorumBanner(p);
+    if(state.fiches[p.id] && state.generating!==p.id) renderFiche(p);
+  }
+  if(qpOpen) renderQuorumPanel();
+}
+
+function renderSessionBar(){
+  const nSpec = presentSpecs().length, nTotal = SESSION.specialites.length;
+  const okCount = PATIENTS.filter(p=>["ok","valide"].includes(dossierEtat(p))).length;
+  const ok = okCount===PATIENTS.length;
+  document.getElementById("sessionBar").innerHTML = `
+    <div class="sb-block">
+      <span class="sb-label">Session RCP</span>
+      <span class="sb-value">${SESSION.date}</span>
+    </div>
+    <div class="sb-sep"></div>
+    <div class="sb-block">
+      <span class="sb-label">Lieu</span>
+      <span class="sb-value">${SESSION.lieu}</span>
+    </div>
+    <div class="sb-sep"></div>
+    <div class="sb-block">
+      <span class="sb-label">Coordonnateur</span>
+      <span class="sb-value">${SESSION.coordonnateur}</span>
+    </div>
+    <div class="quorum">
+      <div class="quorum-chips">
+        ${SESSION.specialites.map(s=>qcChip(s,true)).join("")}
+      </div>
+      <button class="quorum-status ${ok?'ok':'ko'}" onclick="openQuorumPanel()" title="Émargement, départs et quorum par dossier">
+        ${ok ? 'Quorum atteint' : 'Quorum'} · ${okCount}/${PATIENTS.length} dossiers
+        <span class="qs-sub">${nSpec}/${nTotal} spécialités</span>
+      </button>
+    </div>`;
+}
+
+function renderAlert(){
+  const el = document.getElementById("quorumAlert");
+  const open = PATIENTS.filter(p=>!state.decisions[p.id]);
+  const needs = (p,code)=>(p.specialitesRequises||[]).includes(code);
+  const lines = [];
+
+  // Spécialité partie : dossiers qui ne peuvent plus être validés
+  SESSION.specialites.filter(s=>!isIn(s)).forEach(s=>{
+    const hit = open.filter(p=>needs(p,s.code));
+    if(!hit.length) return;
+    lines.push(`<div class="qa-line lost">✗ <b>${s.nom} absente${s.parti?' depuis '+fmtH(s.parti):''}</b> :
+      ${hit.map(p=>p.initials).join(", ")} ${plural(hit.length,"ne peut plus être validé","ne peuvent plus être validés")} en séance, à représenter.</div>`);
+  });
+
+  // Départ annoncé : dossiers à passer avant
+  SESSION.specialites.filter(s=>isIn(s)&&s.depart)
+    .sort((a,b)=>a.depart.localeCompare(b.depart))
+    .forEach(s=>{
+      const hit = open.filter(p=>needs(p,s.code) && dossierQuorum(p).ok);
+      if(!hit.length) return;
+      lines.push(`<div class="qa-line risk">⏱ <b>${s.nom} (${s.medecin||s.code}) part à ${fmtH(s.depart)}</b> :
+        ${hit.length} ${plural(hit.length,"dossier en dépend","dossiers en dépendent")} (${hit.map(p=>p.initials).join(", ")}), à passer avant ce départ.</div>`);
     });
-    </script>
 
-    <script>
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', function() {
-        navigator.serviceWorker.register('/service-worker.js').then(function(registration) {
-          console.log('ServiceWorker registration successful with scope: ', registration.scope);
-        }, function(err) {
-          console.log('ServiceWorker registration failed: ', err);
-        });
-      });
+  const sug = suggestedOrder();
+  if(lines.length && sug.join()!==state.order.join()){
+    lines.push(`<div class="qa-line"><button class="qa-btn" onclick="applyOrder()">↕ Appliquer l'ordre suggéré : ${sug.map(id=>pById(id).initials).join(" → ")}</button></div>`);
+  }
+  el.innerHTML = lines.join("");
+  el.classList.toggle("show", lines.length>0);
+  el.classList.toggle("lost", lines.some(l=>l.includes("qa-line lost")));
+}
+
+function quorumBadge(p){
+  const e = dossierEtat(p), d = state.decisions[p.id], q = dossierQuorum(p);
+  if(e==="valide")  return `<span class="pc-status done">✓ Décision validée ${fmtH(d.heure)}</span>`;
+  if(e==="reporte") return `<span class="pc-status bad">↻ À représenter · ${d.raisonCourte}</span>`;
+  if(e==="ko")      return `<span class="pc-status bad">✗ Quorum · manque ${q.manque.join(", ")}</span>`;
+  if(q.departs.length) return `<span class="pc-status ko">⏱ ${q.departs[0].code} part à ${fmtH(q.departs[0].depart)}</span>`;
+  return `<span class="pc-status ok">Quorum ✓</span>`;
+}
+
+function renderPatientList(){
+  document.getElementById("patientList").innerHTML = state.order.map(pById).map((p,i)=>`
+    <div class="patient-card ${p.id===state.current?'active':''}" data-id="${p.id}" onclick="selectPatient('${p.id}')">
+      <div class="pc-top">
+        <span class="pc-initials"><span class="pc-rank">${i+1}</span>${p.initials}</span>
+        <span class="pc-tag" style="background:${p.accent}">${p.cancer}</span>
+      </div>
+      <div class="pc-meta">${p.age} ans · ${p.sex==='F'?'Femme':'Homme'} · ${p.docs.length} documents</div>
+      <div class="pc-id">${p.id}</div>
+      <div class="pc-badges">
+        <span class="pc-status ${p.complet?'ok':'ko'}">
+          ${p.complet ? '✓ Dossier complet' : '⚠ '+p.manquants.length+' élément'+(p.manquants.length>1?'s':'')+' manquant'+(p.manquants.length>1?'s':'')}
+        </span>
+        ${quorumBadge(p)}
+      </div>
+    </div>`).join("");
+}
+
+// Bandeau quorum dans la vue dossier
+function renderQuorumBanner(p){
+  const el = document.getElementById("quorumBanner");
+  if(!el) return;
+  const e = dossierEtat(p), d = state.decisions[p.id], q = dossierQuorum(p);
+  const chips = `<div class="req-chips">${q.req.map(c=>qcChip(spec(c),false)).join("")}</div>`;
+  let cls, icon, title, body;
+  if(e==="valide"){
+    cls="ok"; icon="✓"; title=`Décision validée à ${fmtH(d.heure)} · quorum atteint`;
+    body=`<div class="cmp-item">${d.participants.length} participants émargés. La fiche est tracée et datée.</div>`;
+  } else if(e==="reporte"){
+    cls="bad"; icon="↻"; title="À représenter à la prochaine séance";
+    body=`<div class="cmp-item"><strong>Motif</strong> : ${esc(d.raisonLongue)}. Dossier reporté à ${fmtH(d.heure)}.</div>`;
+  } else if(e==="ko"){
+    cls="bad"; icon="✗"; title="Quorum non atteint pour ce dossier";
+    body=`<div class="cmp-item"><strong>Manque</strong> : ${q.manque.map(c=>{const s=spec(c);return s.nom+(s.parti?` (parti à ${fmtH(s.parti)})`:"");}).join(", ")}.
+          La décision ne peut pas être validée : le dossier doit être représenté avec le spécialiste manquant (règle HAS).</div>${chips}`;
+  } else {
+    cls = q.departs.length ? "ko" : "ok"; icon = q.departs.length ? "⏱" : "✓";
+    title="Quorum atteint pour ce dossier";
+    body = (q.departs.length
+      ? q.departs.map(s=>`<div class="cmp-item"><strong>${s.nom} part à ${fmtH(s.depart)}</strong> : à présenter avant ce départ.</div>`).join("")
+      : `<div class="cmp-item">Toutes les spécialités requises sont présentes.</div>`) + chips;
+  }
+  el.innerHTML = `<div class="completeness ${cls}"><span class="cmp-icon">${icon}</span><div style="flex:1"><div class="cmp-title">${title}</div>${body}</div></div>`;
+}
+
+// ================= Panneau émargement =================
+function openQuorumPanel(){ qpOpen = true; renderQuorumPanel(); document.getElementById("qpOverlay").classList.add("open"); }
+function closeQuorumPanel(){ qpOpen = false; document.getElementById("qpOverlay").classList.remove("open"); }
+
+function renderQuorumPanel(){
+  document.getElementById("qpSub").textContent = `${SESSION.date} · ${SESSION.lieu} · coordonnateur ${SESSION.coordonnateur}`;
+  const dossiersFor = code => PATIENTS.filter(p=>(p.specialitesRequises||[]).includes(code));
+  const etatTxt = p=>{
+    const e = dossierEtat(p), d = state.decisions[p.id], q = dossierQuorum(p);
+    if(e==="valide")  return `<span class="q-done">✓ Validé à ${fmtH(d.heure)}</span>`;
+    if(e==="reporte") return `<span class="q-ko">↻ À représenter (${d.raisonCourte})</span>`;
+    if(e==="ko")      return `<span class="q-ko">Non atteint · manque ${q.manque.join(", ")}</span>`;
+    return `<span class="q-ok">Atteint</span>${q.departs.length?` <span class="muted">· ⏱ ${q.departs[0].code} ${fmtH(q.departs[0].depart)}</span>`:""}`;
+  };
+  document.getElementById("qpBody").innerHTML = `
+    <div class="qp-h">Présence par spécialité</div>
+    <div class="qp-scroll"><table class="qp-table">
+      <thead><tr><th>Spécialité</th><th>Médecin</th><th>Statut</th><th>Départ annoncé</th><th>Dossiers concernés</th></tr></thead>
+      <tbody>${SESSION.specialites.map(s=>{
+        const dos = dossiersFor(s.code);
+        return `<tr>
+          <td>${qcChip(s,false)} ${s.nom}</td>
+          <td>${s.medecin || '<span class="muted">à renseigner</span>'}</td>
+          <td><select onchange="setStatut('${s.code}',this.value)">
+            ${Object.entries(STATUTS).map(([k,v])=>`<option value="${k}" ${s.statut===k?'selected':''}>${v}</option>`).join("")}
+          </select></td>
+          <td><input type="time" value="${s.depart||''}" onchange="setDepart('${s.code}',this.value)" ${isIn(s)?'':'disabled'}></td>
+          <td>${dos.length ? dos.map(p=>p.initials).join(", ") : '<span class="muted">aucun</span>'}</td>
+        </tr>`;}).join("")}
+      </tbody>
+    </table></div>
+
+    <div class="qp-h">Quorum par dossier (ordre du jour)</div>
+    <div class="qp-scroll"><table class="qp-table">
+      <thead><tr><th>#</th><th>Dossier</th><th>Spécialités requises</th><th>Quorum</th></tr></thead>
+      <tbody>${state.order.map(pById).map((p,i)=>`<tr>
+        <td class="muted">${i+1}</td>
+        <td><b>${p.initials}</b> <span class="muted">· ${p.cancer}</span></td>
+        <td><div class="req-chips" style="margin:0">${(p.specialitesRequises||[]).map(c=>qcChip(spec(c),false)).join("")}</div></td>
+        <td>${etatTxt(p)}</td>
+      </tr>`).join("")}</tbody>
+    </table></div>
+
+    <div class="qp-rules">
+      Quorum calculé par dossier, selon les spécialités requises pour l'organe (proposition à valider avec le Dr Jerbi).
+      Minimum HAS : 3 spécialités différentes. La présence en visio sécurisée compte dans le quorum.
+      Sans quorum, le dossier est représenté avec le spécialiste manquant à la séance suivante.
+    </div>
+
+    <div class="qp-h">Journal de séance</div>
+    <div class="qp-log">${state.log.length
+      ? state.log.slice().reverse().map(e=>`<div><span>${e.h}</span>${e.t}</div>`).join("")
+      : '<span class="muted">Aucun événement pour l\'instant.</span>'}</div>`;
+}
+
+// ================= Validation / report =================
+function participantsSnapshot(){
+  return presentSpecs().map(s=>({ code:s.code, nom:s.nom, medecin:s.medecin||"Médecin à renseigner", distance:s.statut==="distance" }));
+}
+const esc = s => String(s).replace(/[&<>"']/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+state.drafts = {};           // texte de décision en cours de saisie, par dossier
+state.confirmIncomplet = null;  // dossier incomplet en attente de confirmation
+
+function saveDraft(id, v){ state.drafts[id] = v; }
+
+// force = true : validation confirmée malgré un dossier incomplet
+function validerDecision(id, force){
+  const p = pById(id), q = dossierQuorum(p);
+  if(!q.ok) return;
+  const texte = (state.drafts[id]||"").trim();
+  if(!texte){
+    const ta = document.getElementById("decText");
+    if(ta){ ta.classList.add("err"); ta.focus(); }
+    return;
+  }
+  if(!p.complet && !force){ state.confirmIncomplet = id; refreshAll(); return; }
+  state.confirmIncomplet = null;
+  state.decisions[id] = { statut:"valide", heure:nowHM(), participants:participantsSnapshot(), texte,
+                          incomplet: !p.complet, manquants: p.complet ? [] : p.manquants.map(m=>m.item) };
+  logEvent(`Dossier ${p.initials} : décision validée par ${SESSION.coordonnateur}, quorum atteint`
+           + (p.complet ? "" : ", malgré un dossier incomplet"));
+  refreshAll();
+}
+// motif : "quorum" (spécialiste manquant) ou "incomplet" (pièces manquantes)
+function reporterDossier(id, motif){
+  const p = pById(id), q = dossierQuorum(p);
+  state.confirmIncomplet = null;
+  const d = { statut:"reporte", heure:nowHM(), participants:participantsSnapshot(), quorumOK:q.ok, manque:[] };
+  if(motif==="incomplet"){
+    d.raisonCourte = "dossier incomplet";
+    d.raisonLongue = "dossier incomplet";
+    d.attendu = p.manquants.map(m=>m.item.toLowerCase()).join(" ; ");
+  } else {
+    d.manque = q.manque;
+    d.raisonCourte = "manque " + q.manque.join(", ");
+    d.raisonLongue = "spécialiste manquant, " + q.manque.map(specName).join(", ");
+    d.attendu = "présence : " + q.manque.map(specName).join(", ");
+  }
+  state.decisions[id] = d;
+  logEvent(`Dossier ${p.initials} : reporté et inscrit à la séance du ${SESSION.prochaineSeance} (${d.raisonCourte})`);
+  refreshAll();
+}
+function annulerDecision(id){
+  const p = pById(id);
+  if(state.decisions[id] && state.decisions[id].texte) state.drafts[id] = state.decisions[id].texte;
+  delete state.decisions[id];
+  logEvent(`Dossier ${p.initials} : décision annulée`);
+  refreshAll();
+}
+function annulerConfirmation(){ state.confirmIncomplet = null; refreshAll(); }
+
+// ================= Diffusion du compte-rendu =================
+// Destinataires préremplis ; envoi SIMULÉ pour la démo.
+state.diffusionOpen = null;
+state.diffusionChoix = {};
+function destinataires(p){
+  const list = [];
+  if(p.medecinReferent) list.push({ id:"ref", label:p.medecinReferent, role:"médecin référent", canal:"messagerie de la clinique", interne:true });
+  if(p.medecinTraitant) list.push({ id:"trt", label:p.medecinTraitant, role:"médecin traitant", canal:"messagerie sécurisée, hors clinique", interne:false });
+  list.push({ id:"dos", label:"Dossier patient", role:"archivage", canal:`CliniSys, IPP ${p.ipp}`, interne:true });
+  return list;
+}
+function ouvrirDiffusion(id){
+  state.diffusionOpen = id;
+  state.diffusionChoix[id] = Object.fromEntries(destinataires(pById(id)).map(x=>[x.id,true]));
+  refreshAll();
+}
+function toggleDest(id, destId, on){ state.diffusionChoix[id][destId] = on; }
+function fermerDiffusion(){ state.diffusionOpen = null; refreshAll(); }
+function envoyerDiffusion(id){
+  const p = pById(id), choix = state.diffusionChoix[id] || {};
+  const dest = destinataires(p).filter(x=>choix[x.id]);
+  if(!dest.length) return;
+  state.decisions[id].diffusion = { heure: nowHM(), dest };
+  state.diffusionOpen = null;
+  logEvent(`Dossier ${p.initials} : compte-rendu diffusé à ${dest.map(x=>x.label+" ("+x.role+")").join(", ")}`);
+  refreshAll();
+}
+function diffusionBlock(p, d){
+  if(d.diffusion){
+    return `<div class="dec-note ok"><b>✉ Compte-rendu diffusé à ${fmtH(d.diffusion.heure)}</b> :
+      ${d.diffusion.dest.map(x=>`${esc(x.label)} (${x.role})`).join(", ")}.</div>
+      <div class="dec-sim">Envoi simulé pour la démonstration.</div>`;
+  }
+  if(state.diffusionOpen!==p.id) return "";
+  const choix = state.diffusionChoix[p.id] || {};
+  return `<div class="diff">
+    <div class="dec-title">Diffuser le compte-rendu</div>
+    ${destinataires(p).map(x=>`<label class="diff-row">
+      <input type="checkbox" ${choix[x.id]?"checked":""} onchange="toggleDest('${p.id}','${x.id}',this.checked)">
+      <span><b>${esc(x.label)}</b> · ${x.role}<br><small>${x.canal}${x.interne?"":" · canal à valider avec la clinique"}</small></span>
+    </label>`).join("")}
+    <div class="dec-row">
+      <button class="dec-btn" onclick="envoyerDiffusion('${p.id}')">✉ Envoyer</button>
+      <button class="dec-btn secondary" onclick="fermerDiffusion()">Annuler</button>
+    </div>
+  </div>`;
+}
+function imprimerFiche(){
+  const p = pById(state.current);
+  if(p) logEvent(`Dossier ${p.initials} : fiche imprimée`);
+  if(qpOpen) renderQuorumPanel();
+  window.print();
+}
+
+function decisionBlock(p){
+  const e = dossierEtat(p), d = state.decisions[p.id], q = dossierQuorum(p);
+  let inner;
+  if(e==="valide"){
+    inner = `<div class="dec-text">${esc(d.texte)}</div>
+             <div class="dec-note ok"><b>✓ Décision validée à ${fmtH(d.heure)}</b> par ${SESSION.coordonnateur}, quorum atteint.
+               Fiche datée, participants émargés.</div>
+             ${d.incomplet ? `<div class="dec-note bad"><b>Validée avec un dossier incomplet</b> : ${d.manquants.map(esc).join(" ; ")}.</div>` : ""}
+             ${diffusionBlock(p, d)}
+             <div class="dec-row">
+               ${d.diffusion || state.diffusionOpen===p.id ? "" : `<button class="dec-btn" onclick="ouvrirDiffusion('${p.id}')">✉ Diffuser le compte-rendu</button>`}
+               <button class="dec-btn secondary" onclick="imprimerFiche()">⎙ Imprimer / PDF</button>
+               ${d.diffusion ? "" : `<button class="dec-btn secondary" onclick="annulerDecision('${p.id}')">Annuler la validation</button>`}
+             </div>`;
+  } else if(e==="reporte"){
+    inner = `<div class="dec-note bad"><b>↻ Reporté à la prochaine séance</b> : ${esc(d.raisonLongue)}.</div>
+             <div class="dec-next">Inscrit à la séance du <b>${SESSION.prochaineSeance}</b>${d.attendu ? ` · en attente : ${esc(d.attendu)}` : ""}</div>
+             <div class="dec-row"><button class="dec-btn secondary" onclick="annulerDecision('${p.id}')">Annuler le report</button></div>`;
+  } else if(e==="ok" && state.confirmIncomplet===p.id){
+    inner = `<div class="dec-note bad"><b>⚠ Dossier incomplet</b> : ${p.manquants.map(m=>esc(m.item)).join(" ; ")}.
+               Valider quand même, ou reporter le dossier jusqu'à réception des pièces ?</div>
+             <div class="dec-row">
+               <button class="dec-btn" onclick="validerDecision('${p.id}', true)">Valider quand même</button>
+               <button class="dec-btn warn" onclick="reporterDossier('${p.id}','incomplet')">↻ Reporter (pièces manquantes)</button>
+               <button class="dec-btn secondary" onclick="annulerConfirmation()">Retour</button>
+             </div>`;
+  } else if(e==="ok"){
+    inner = `<label class="dec-note" for="decText">Décision prise en séance</label>
+             <textarea id="decText" class="dec-input" rows="3"
+               placeholder="Ex. : chimiothérapie néoadjuvante, puis chirurgie ; réévaluation après 4 cycles."
+               oninput="saveDraft('${p.id}', this.value); this.classList.remove('err')">${esc(state.drafts[p.id]||"")}</textarea>
+             <div class="dec-note">La validation fige la décision, la date, l'heure et la liste des participants.${p.complet ? "" : ` <b style="color:var(--amber-ink)">Dossier incomplet : une confirmation sera demandée.</b>`}</div>
+             <div class="dec-row"><button class="dec-btn" onclick="validerDecision('${p.id}')">✓ Valider la décision (${SESSION.coordonnateur})</button></div>`;
+  } else {
+    inner = `<div class="dec-note bad"><b>Validation impossible</b> : quorum non atteint pour ce dossier (manque ${q.manque.map(specName).join(", ")}).</div>
+             <div class="dec-row">
+               <button class="dec-btn" disabled>✓ Valider la décision</button>
+               <button class="dec-btn warn" onclick="reporterDossier('${p.id}','quorum')">↻ Reporter à la prochaine séance</button>
+             </div>`;
+  }
+  return `<div class="decision"><div class="dec-title">Décision de la RCP</div>${inner}</div>`;
+}
+
+function selectPatient(id){
+  state.current = id;
+  document.querySelectorAll(".patient-card").forEach(c=>c.classList.toggle("active", c.dataset.id===id));
+  renderPatient(PATIENTS.find(p=>p.id===id));
+}
+
+function renderPatient(p){
+  const sysSet = [...new Set(p.docs.map(d=>d.system))];
+  const cmp = p.complet
+    ? `<div class="completeness ok">
+         <span class="cmp-icon">✓</span>
+         <div>
+           <div class="cmp-title">Dossier complet</div>
+           <div class="cmp-item">Toutes les pièces requises sont présentes. Le dossier peut être présenté en séance.</div>
+         </div>
+       </div>`
+    : `<div class="completeness ko">
+         <span class="cmp-icon">⚠</span>
+         <div>
+           <div class="cmp-title">Dossier incomplet: ${p.manquants.length} élément${p.manquants.length>1?'s':''} manquant${p.manquants.length>1?'s':''}</div>
+           ${p.manquants.map(m=>`<div class="cmp-item"><strong>${m.item}</strong>: ${m.detail}</div>`).join("")}
+         </div>
+       </div>`;
+
+  document.getElementById("main").innerHTML = `
+    <div class="patient-head">
+      <div>
+        <div class="ph-name">${p.initials} <span style="font-weight:400;color:var(--ink-soft);font-size:15px">· ${p.age} ans</span></div>
+        <div class="ph-cancer">${p.cancerLabel} · ${p.cim10}</div>
+      </div>
+      <div class="ph-right">${p.id}<br>IPP ${p.ipp}${p.ancien?'<br>'+p.historique:''}</div>
+    </div>
+
+    ${cmp}
+    <div id="quorumBanner"></div>
+
+    <div class="split">
+      <div>
+        <div class="col-label">Sources dispersées <span class="col-count">${p.docs.length} docs · ${sysSet.length} systèmes</span></div>
+        <div id="docs">${p.docs.map((d,i)=>`
+          <div class="doc" onclick="toggleDoc(${i})">
+            <div class="doc-head">
+              <div>
+                <div class="doc-title">${d.type}<span class="lang-chip">${d.lang}</span>${d.partial?'<span class="partial-chip">conclusion seule</span>':''}</div>
+                <div class="doc-sub">${d.author} · ${d.date}</div>
+              </div>
+              <div style="display:flex;align-items:center;gap:10px">${sysChip(d.system)}<span class="doc-toggle">▸</span></div>
+            </div>
+            <div class="doc-body"><div class="doc-body-inner">${d.body}</div></div>
+          </div>`).join("")}</div>
+      </div>
+
+      <div>
+        <div class="col-label">Fiche RCP <span class="col-count">socle commun INCa</span></div>
+        <button class="gen-btn" id="genBtn" onclick="generate('${p.id}')">✦ Préparer la fiche RCP</button>
+        <div class="summary-wrap" id="summaryWrap" style="margin-top:16px">
+          <div class="placeholder-paper">
+            <div class="pp-icon">✦</div>
+            <p>Consolide ${p.docs.length} documents provenant de ${sysSet.length} systèmes en une fiche structurée selon le socle commun INCa.</p>
+          </div>
+        </div>
+      </div>
+    </div>`;
+
+  renderQuorumBanner(p);
+  if(state.fiches[p.id]){
+    renderFiche(p);
+    const b = document.getElementById("genBtn");
+    if(b) b.style.display = "none";
+  }
+}
+
+function toggleDoc(i){
+  event.stopPropagation();
+  const docs = document.querySelectorAll("#docs .doc");
+  const isOpen = docs[i].classList.contains("open");
+  docs.forEach(d=>d.classList.remove("open"));
+  if(!isOpen) docs[i].classList.add("open");
+}
+
+const sleep = ms => new Promise(r=>setTimeout(r,ms));
+
+async function generate(id){
+  const p = PATIENTS.find(x=>x.id===id);
+  const btn = document.getElementById("genBtn");
+  const wrap = document.getElementById("summaryWrap");
+  btn.disabled = true;
+  state.generating = id;
+
+  const STEPS = [
+    { label:"Collecte des sources",            sub:`CliniSys · Synapse · Syslab · SharePoint` },
+    { label:"Rapprochement des identifiants",  sub:`IPP ${p.ipp}` },
+    { label:"Contrôle de complétude",          sub: p.complet ? "Toutes pièces présentes" : `${p.manquants.length} pièce(s) manquante(s)` },
+    { label:"Extraction structurée",           sub:"CIM-10 · TNM · profil moléculaire" },
+    ...(p.ancien ? [{ label:"Synthèse de l'historique", sub:"23 documents, 2019 → 2025" }] : []),
+    { label:"Mise au format socle commun INCa", sub:"Modèle local · aucun appel réseau" },
+  ];
+
+  const totalMs = 5500;
+  let elapsed = 0, pct = 0, cur = 0;
+
+  wrap.innerHTML = `<div class="pipeline">
+    <div class="pipe-header">
+      <div class="pipe-pulse"></div>
+      <span class="pipe-title" id="pipeTitle">Préparation en cours…</span>
+      <span class="pipe-elapsed" id="pipeElapsed">0s</span>
+    </div>
+    <div class="pipe-bar-wrap"><div class="pipe-bar" id="pipeBar" style="transition:width 1s linear"></div></div>
+    ${STEPS.map((s,i)=>`
+      <div class="pipe-step">
+        <div class="pipe-icon" id="picon${i}">
+          <svg viewBox="0 0 10 10" fill="none"><path d="M1.5 5L4 7.5L8.5 2.5" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <div class="dot"></div>
+        </div>
+        <div>
+          <div class="pipe-label" id="plabel${i}">${s.label}</div>
+          <div class="pipe-sub" id="psub${i}">${s.sub}</div>
+        </div>
+      </div>`).join("")}
+  </div>`;
+
+  const barEl = document.getElementById("pipeBar");
+  const elEl  = document.getElementById("pipeElapsed");
+  const ttEl  = document.getElementById("pipeTitle");
+
+  const activate = i => {
+    if(i>=STEPS.length) return;
+    document.getElementById(`picon${i}`).classList.add("active");
+    document.getElementById(`plabel${i}`).classList.add("active");
+    document.getElementById(`psub${i}`).classList.add("show");
+  };
+  const complete = i => {
+    if(i>=STEPS.length) return;
+    const ic = document.getElementById(`picon${i}`), lb = document.getElementById(`plabel${i}`);
+    ic.classList.remove("active"); ic.classList.add("done");
+    lb.classList.remove("active"); lb.classList.add("done");
+  };
+
+  const tick = setInterval(()=>{ elapsed++; elEl.textContent = elapsed+"s"; }, 1000);
+  activate(0);
+  const step = 92 / (totalMs/500);
+  const bar = setInterval(()=>{
+    pct = Math.min(pct+step, 92);
+    barEl.style.width = pct+"%";
+    const want = Math.min(Math.floor((pct/92)*STEPS.length), STEPS.length-1);
+    if(want > cur){ complete(cur); cur = want; activate(cur); }
+  }, 500);
+
+  await sleep(totalMs);
+
+  clearInterval(bar); clearInterval(tick);
+  for(let i=cur;i<STEPS.length;i++) complete(i);
+  barEl.style.transition = "width .4s ease";
+  barEl.style.width = "100%";
+  ttEl.textContent = "Fiche prête";
+  await sleep(700);
+
+  const pipe = wrap.querySelector(".pipeline");
+  if(pipe){ pipe.style.transition="opacity .4s ease"; pipe.style.opacity="0"; await sleep(420); }
+
+  state.fiches[id] = true;
+  state.generating = null;
+  // L'utilisateur a pu changer de dossier pendant la préparation
+  if(state.current !== id) return;
+  renderFiche(p);
+  const b = document.getElementById("genBtn");
+  if(b) b.style.display = "none";
+}
+
+function renderFiche(p){
+  const wrap = document.getElementById("summaryWrap");
+  const f = FICHES[p.id];
+  const q = dossierQuorum(p);
+  const dec = state.decisions[p.id];
+  // Après validation, la liste des participants est figée (émargement)
+  const participants = dec ? dec.participants : participantsSnapshot();
+  const absents = dec ? [] : SESSION.specialites.filter(s=>!isIn(s));
+  const quorumOK = dec ? (dec.statut==="valide" || dec.quorumOK) : q.ok;
+  const manqueTxt = (dec && dec.manque ? dec.manque : q.manque).map(specName).join(", ");
+  const valide = dec && dec.statut==="valide";
+  const statutFiche = dec && dec.statut==="valide" ? `Validée · ${fmtH(dec.heure)}`
+                    : dec && dec.statut==="reporte" ? "À représenter"
+                    : p.complet ? "Fiche complétée" : "En cours";
+  const statutCls = dec && dec.statut==="valide" ? "valid"
+                  : dec ? "pending"
+                  : p.complet ? "valid" : "pending";
+
+  const body = f.sections.map(s=>{
+    if(s.question){
+      return `<div class="sum-section synthese">
+        <div class="sum-h">${s.h}</div>
+        <div class="sum-t">${s.texte}</div>
+        <div class="question-box">
+          <div class="question-label">Question posée à la RCP</div>
+          <div class="question-text">${s.question}</div>
+        </div>
+      </div>`;
     }
-    </script>
+    if(s.imagerie){
+      const study = (typeof IMAGING!=="undefined") ? IMAGING[p.id] : null;
+      if(!study) return "";
+      const chips = study.images
+        .map((im,i)=> im.annotation ? `
+          <span class="scan-chip" onclick="openViewer('${p.id}',${i})">
+            <span class="sc-mod">${study.modality}</span>
+            <span class="sc-label">${im.annotation.label} · ${im.annotation.measure}</span>
+            <span class="sc-arrow">→</span>
+          </span>` : "").join("");
+      if(!chips.trim()) return "";
+      return `<div class="sum-section">
+        <div class="sum-h">${s.h}</div>
+        ${chips}
+        <div class="imagerie-note">Comptes-rendus lus et structurés. Accès direct aux coupes ; les images ne sont pas interprétées par le système.</div>
+      </div>`;
+    }
+    if(s.historique){
+      return `<div class="sum-section histo">
+        <div class="sum-h">${s.h}</div>
+        <div class="sum-t">${s.texte}</div>
+      </div>`;
+    }
+    if(s.items){
+      let rows = s.items.map(([k,v])=>
+        `<div class="k">${k}</div><div class="v ${/⚠|NON$|manquant/i.test(v)?'warn':''}">${v}</div>`);
+      // Section « Proposition » : la décision validée remplace « À valider en séance »
+      if(s.proposition && dec){
+        rows = s.items.filter(([k,v])=>!/à valider en séance/i.test(v))
+          .map(([k,v])=>`<div class="k">${k}</div><div class="v ${/⚠|NON$|manquant/i.test(v)?'warn':''}">${v}</div>`);
+        rows.push(valide
+          ? `<div class="k">Décision de la RCP</div><div class="v dec-v">${esc(dec.texte)}</div>`
+          : `<div class="k">Décision de la RCP</div><div class="v warn">Non prise, dossier à représenter (${esc(dec.raisonCourte)})</div>`);
+      }
+      return `<div class="sum-section ${s.incomplete?'warn':''}">
+        <div class="sum-h">${s.h}</div>
+        <div class="kv">${rows.join("")}</div>
+      </div>`;
+    }
+    return `<div class="sum-section ${s.sources?'sources':''}">
+      <div class="sum-h">${s.h}</div>
+      <div class="sum-t">${s.texte}</div>
+    </div>`;
+  }).join("");
+
+  wrap.innerHTML = `
+    <div class="paper">
+      <div class="paper-head">
+        <div class="ph-row">
+          <div>
+            <div class="paper-title">Fiche de réunion de concertation pluridisciplinaire</div>
+            <div class="paper-ref">Socle commun INCa / ASIP Santé · ${p.nom} · IPP ${p.ipp}</div>
+          </div>
+          <span class="fiche-status ${statutCls}">${statutFiche}</span>
+        </div>
+        <div class="paper-meta">
+          <div class="pm-item"><b>Date de session</b> · ${SESSION.date}</div>
+          <div class="pm-item"><b>Lieu</b> · ${SESSION.lieu}</div>
+          <div class="pm-item"><b>Motif</b> · ${f.motif}</div>
+          <div class="pm-item"><b>Statut du cas</b> · ${f.natureDiscussion}</div>
+          <div class="pm-item"><b>Coordonnateur</b> · ${SESSION.coordonnateur}</div>
+          <div class="pm-item"><b>Quorum</b> · ${quorumOK
+            ? `<span style="color:#186A4E">Atteint</span>`
+            : `<span style="color:#9A6212">Non atteint · manque ${manqueTxt}</span>`}</div>
+          <div class="pm-item"><b>Spécialités requises</b> · ${q.req.join(", ")}</div>
+          ${dec && dec.statut==="valide" ? `<div class="pm-item" style="grid-column:1/-1"><b>Validée le</b> · ${SESSION.date}, ${fmtH(dec.heure)}, par ${SESSION.coordonnateur}</div>` : ""}
+          ${dec && dec.statut==="reporte" ? `<div class="pm-item" style="grid-column:1/-1"><b>Représenté le</b> · ${SESSION.prochaineSeance}</div>` : ""}
+          ${dec && dec.diffusion ? `<div class="pm-item" style="grid-column:1/-1"><b>Diffusée à</b> · ${dec.diffusion.dest.map(x=>esc(x.label)+" ("+x.role+")").join(", ")}, ${fmtH(dec.diffusion.heure)}</div>` : ""}
+          <div class="pm-item" style="grid-column:1/-1"><b>Participants</b> · ${participants.map(s=>`${s.medecin} (${s.nom}${s.distance?", visio":""})`).join(" · ")}${absents.length?` <span style="color:#9A6212">· absent : ${absents.map(s=>s.nom).join(", ")}</span>`:""}</div>
+        </div>
+      </div>
+      ${body}
+    </div>
+    <div class="footnote">
+      <strong>Brouillon structuré, soumis à validation médicale.</strong>
+      Consolidé sur cette machine à partir de ${p.docs.length} documents.
+    </div>
+    ${decisionBlock(p)}`;
+}
+
+// ---------------- Visionneuse d'imagerie ----------------
+const V = { patientId:null, idx:0, showAnn:true };
+
+function openViewer(patientId, imgIdx){
+  if(typeof IMAGING==="undefined") return;
+  const study = IMAGING[patientId];
+  if(!study) return;
+  V.patientId = patientId; V.idx = imgIdx||0; V.showAnn = true;
+  const p = PATIENTS.find(x=>x.id===patientId);
+  document.getElementById("vtName").textContent = `${p.initials} · ${p.age} ans`;
+  document.getElementById("vtMeta").textContent = `${patientId} · ${study.modality} · ${study.studyDescription}`;
+  document.getElementById("seriesRail").innerHTML = study.images.map((im,i)=>`
+    <div class="series-thumb ${i===V.idx?'active':''}" onclick="selectSlice(${i})">
+      <img src="${im.src}" alt="${im.name}"><div class="st-name">${im.name}</div>
+    </div>`).join("");
+  const base = window.OHIF_BASE || "http://localhost:3000/viewer";
+  document.getElementById("ohifLink").href = `${base}?StudyInstanceUIDs=${study.studyInstanceUID}`;
+  document.getElementById("wlBright").value = 100;
+  document.getElementById("wlContrast").value = 115;
+  document.getElementById("annToggle").classList.add("on");
+  renderSlice();
+  document.getElementById("viewerOverlay").classList.add("open");
+}
+
+function selectSlice(i){
+  V.idx = i;
+  document.querySelectorAll("#seriesRail .series-thumb").forEach((t,k)=>t.classList.toggle("active",k===i));
+  renderSlice();
+}
+
+function renderSlice(){
+  const study = IMAGING[V.patientId];
+  const im = study.images[V.idx];
+  document.getElementById("scanImg").src = im.src;
+  document.getElementById("ovTL").innerHTML = `${study.clinic||""}<br>${study.modality} · ${study.studyDescription}`;
+  document.getElementById("ovTR").innerHTML = `${V.patientId}<br>Coupe ${V.idx+1}/${study.images.length}`;
+  document.getElementById("ovBL").innerHTML = im.name;
+  const marker = document.getElementById("lesionMarker");
+  if(im.annotation && V.showAnn){
+    positionMarker(document.getElementById("scanImg"), im);
+    document.getElementById("lesionTag").innerHTML = `${im.annotation.measure}<small>${im.annotation.label}</small>`;
+    marker.style.display = "block";
+  } else { marker.style.display = "none"; }
+  applyWL();
+}
+
+function positionMarker(img, im){
+  const marker = document.getElementById("lesionMarker");
+  const doPos = () => {
+    const size = im.size || 448;
+    const rect = img.getBoundingClientRect();
+    const wrapRect = document.getElementById("canvasWrap").getBoundingClientRect();
+    const scale = rect.width / size;
+    marker.style.left = (rect.left - wrapRect.left + im.annotation.x*scale - 23) + "px";
+    marker.style.top  = (rect.top  - wrapRect.top  + im.annotation.y*scale - 23) + "px";
+  };
+  if(img.complete && img.naturalWidth) doPos(); else img.onload = doPos;
+  window.__markerReposition = doPos;
+}
+
+function applyWL(){
+  const b = document.getElementById("wlBright").value;
+  const c = document.getElementById("wlContrast").value;
+  document.getElementById("scanImg").style.filter = `brightness(${b/100}) contrast(${c/100})`;
+}
+
+function toggleAnn(){
+  V.showAnn = !V.showAnn;
+  document.getElementById("annToggle").classList.toggle("on", V.showAnn);
+  renderSlice();
+}
+
+function closeViewer(){ document.getElementById("viewerOverlay").classList.remove("open"); }
+document.addEventListener("keydown", e=>{ if(e.key==="Escape"){ closeViewer(); closeQuorumPanel(); } });
+window.addEventListener("resize", ()=>{
+  if(window.__markerReposition && document.getElementById("viewerOverlay").classList.contains("open")) window.__markerReposition();
+});
+
+window.OHIF_BASE = "http://localhost:3000/viewer";
+
+renderSessionBar();
+renderAlert();
+renderPatientList();
+</script>
 </body>
 </html>
